@@ -26,6 +26,13 @@ if [[ "$OSTYPE" != "darwin"* ]]; then
   exit 1
 fi
 
+print_row() {
+  app=$(echo $1 | awk -F', ' '{print $1}')
+  label=$(echo $1 | awk -F', ' '{print $2}')
+  ph=$2
+  echo '{"name": "'$label'", "cat": "'$app'", "ph": "'$ph'", "pid": "HUMAN", "tid": "'$app'", "ts": '$timestamp'},'
+}
+
 timestamp=0
 fg=""
 echo '['
@@ -33,14 +40,10 @@ while true; do
     new=$(get_foreground_osx)
     if [[ "$new" != "$fg" ]]; then
         if [[ "$fg" != "" ]]; then
-            app=$(echo $fg | awk -F', ' '{print $1}')
-            label=$(echo $fg | awk -F', ' '{print $2}')
-            echo '{"name": "'$label'", "cat": "'$app'", "ph": "E", "pid": "HUMAN", "tid": "'$app'", "ts": '$timestamp'},'
+            print_row "$fg" E
         fi
         if [[ "$new" != "" ]]; then
-            app=$(echo $new | awk -F', ' '{print $1}')
-            label=$(echo $new | awk -F', ' '{print $2}')
-            echo '{"name": "'$label'", "cat": "'$app'", "ph": "B", "pid": "HUMAN", "tid": "'$app'", "ts": '$timestamp'},'
+            print_row "$new" B
         fi
         fg=$new
     fi
